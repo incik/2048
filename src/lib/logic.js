@@ -89,11 +89,11 @@ const __combineLeft = (row) => {
 
 const __combineRight = (row) => {
   let pts = 0;
-  for (let i = 0; i < row.length - 1; i++) {
-    if (row[i] === row[i + 1]) {
-      row[i] = 0;
-      row[i + 1] *= 2;
-      pts += row[i + 1];
+  for (let i = 3; i >= 1; i--) {
+    if (row[i] === row[i - 1]) {
+      row[i] *= 2;
+      row[i - 1] = 0;
+      pts += row[i];
     }
   }
   return { row: __squashRowRight(row), gainedPoints: pts };
