@@ -49,9 +49,11 @@ const moveDown = (mat) => {
 
 function App() {
   const [mat, setMat] = useState(logic.generate());
+  const [pts, setPts] = useState(0);
 
   return (
     <div className="App">
+      <h1>{pts}</h1>
       <Matrix matrix={mat} />
 
       <table>
@@ -59,23 +61,55 @@ function App() {
           <tr>
             <td></td>
             <td>
-              <button onClick={() => setMat(moveUp(mat))}>up</button>
+              <button
+                onClick={() => {
+                  const res = moveUp(mat);
+                  setMat(res.matrix);
+                  setPts(pts + res.gainedPoints);
+                }}
+              >
+                up
+              </button>
             </td>
             <td></td>
           </tr>
           <tr>
             <td>
-              <button onClick={() => setMat(moveLeft(mat))}>left</button>
+              <button
+                onClick={() => {
+                  const res = moveLeft(mat);
+                  setMat(res.matrix);
+                  setPts(pts + res.gainedPoints);
+                }}
+              >
+                left
+              </button>
             </td>
             <td></td>
             <td>
-              <button onClick={() => setMat(moveRight(mat))}>right</button>
+              <button
+                onClick={() => {
+                  const res = moveRight(mat);
+                  setMat(res.matrix);
+                  setPts(pts + res.gainedPoints);
+                }}
+              >
+                right
+              </button>
             </td>
           </tr>
           <tr>
             <td></td>
             <td>
-              <button onClick={() => setMat(moveDown(mat))}>down</button>
+              <button
+                onClick={() => {
+                  const res = moveDown(mat);
+                  setMat(res.matrix);
+                  setPts(pts + res.gainedPoints);
+                }}
+              >
+                down
+              </button>
             </td>
             <td></td>
           </tr>

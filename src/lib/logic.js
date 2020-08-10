@@ -76,37 +76,44 @@ const __squashColumnDown = (matrix, columnIndex) => {
 // combine
 
 const __combineLeft = (row) => {
+  let pts = 0;
   for (let i = 0; i < row.length - 1; i++) {
     if (row[i] === row[i + 1]) {
       row[i] *= 2;
       row[i + 1] = 0;
+      pts += row[i];
     }
   }
-  return __squashRowLeft(row);
+  return { row: __squashRowLeft(row), gainedPoints: pts };
 };
 
 const __combineRight = (row) => {
+  let pts = 0;
   for (let i = 0; i < row.length - 1; i++) {
     if (row[i] === row[i + 1]) {
       row[i] = 0;
       row[i + 1] *= 2;
+      pts += row[i + 1];
     }
   }
-  return __squashRowRight(row);
+  return { row: __squashRowRight(row), gainedPoints: pts };
 };
 
 const __combineUp = (matrix, columnIndex) => {
+  let pts = 0;
   for (let i = 0; i < 3; i++) {
     if (matrix[i][columnIndex] === matrix[i + 1][columnIndex]) {
       matrix[i][columnIndex] *= 2;
       matrix[i + 1][columnIndex] = 0;
+      pts += matrix[i][columnIndex];
     }
   }
-  return __squashColumnUp(matrix, columnIndex);
+  return { matrix: __squashColumnUp(matrix, columnIndex), gainedPoints: pts };
 };
 
 const __combineDown = (matrix, columnIndex) => {
-  return invertMatrix(__combineUp(invertMatrix(matrix), columnIndex));
+  const combined = __combineUp(invertMatrix(matrix), columnIndex);
+  return { matrix: invertMatrix(combined.matrix), gainedPoints: combined.gainedPoints };
 };
 
 // compare two matrixes and return true if they are equal
@@ -130,35 +137,45 @@ const generate = () => {
 const move = (matrix, direction) => {
   const oldMatrix = JSON.parse(JSON.stringify(matrix)); // hack for deep array copy
 
+  let pts = 0;
+
   switch (direction) {
     case MOVES.LEFT: {
       for (let i = 0; i < 4; i++) {
-        matrix[i] = __combineLeft(__squashRowLeft(matrix[i]));
+        const combined = __combineLeft(__squashRowLeft(matrix[i]));
+        matrix[i] = combined.row;
+        pts += combined.gainedPoints;
       }
       break;
     }
     case MOVES.RIGHT: {
       for (let i = 0; i < 4; i++) {
-        matrix[i] = __combineRight(__squashRowRight(matrix[i]));
+        const combined = __combineRight(__squashRowRight(matrix[i]));
+        matrix[i] = combined.row;
+        pts += combined.gainedPoints;
       }
       break;
     }
     case MOVES.UP: {
       for (let i = 0; i < 4; i++) {
-        matrix = __combineUp(__squashColumnUp(matrix, i), i);
+        const combined = __combineUp(__squashColumnUp(matrix, i), i);
+        matrix = combined.matrix;
+        pts += combined.gainedPoints;
       }
       break;
     }
     case MOVES.DOWN: {
       for (let i = 0; i < 4; i++) {
-        matrix = __combineDown(__squashColumnDown(matrix, i), i);
+        const combined = __combineDown(__squashColumnDown(matrix, i), i);
+        matrix = combined.matrix;
+        pts += combined.gainedPoints;
       }
       break;
     }
   }
 
   // did something change? then add new number
-  return __eqMatrixes(oldMatrix, matrix) ? matrix : __generateNewNumber(matrix);
+  return { matrix: __eqMatrixes(oldMatrix, matrix) ? matrix : __generateNewNumber(matrix), gainedPoints: pts };
 };
 
 module.exports = {
